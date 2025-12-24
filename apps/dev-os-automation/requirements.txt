@@ -1,0 +1,7 @@
+requirements.txt
+pynput==1.7.6
+pygetwindow==0.0.9
+psutil==5.9.5
+send2trash==1.8.0
+pytest==7.4.0
+hypothesis==6.92.0

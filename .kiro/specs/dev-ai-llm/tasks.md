@@ -1,0 +1,172 @@
+# Implementation Plan: Dev AI/LLM Integration System
+
+- [ ] 1. Set up project structure and dependencies
+  - [ ] 1.1 Initialize TypeScript project with LLM dependencies
+    - Create package.json with langchain, openai, @google/generative-ai, fast-check
+    - Configure tsconfig.json for strict mode
+    - Set up project structure (src/, tests/)
+    - _Requirements: 2.1, 2.2, 3.1_
+  - [ ] 1.2 Define core TypeScript interfaces
+    - Create interfaces for Intent, Entity, TaskClassification, ModelConfig
+    - Define ToolCall, ToolResult, ConversationContext types
+    - Create PromptTemplate interface
+    - _Requirements: 1.2, 3.1, 6.1_
+
+- [ ] 2. Implement Intent Recognizer
+  - [ ] 2.1 Create IntentRecognizer class
+    - Implement recognize() with LLM-based intent extraction
+    - Add confidence scoring and ranking
+    - Handle ambiguous intent detection
+    - _Requirements: 1.2, 1.3_
+  - [ ]* 2.2 Write property test for highest confidence intent selection
+    - **Property 1: Highest Confidence Intent Selection**
+    - **Validates: Requirements 1.2**
+  - [ ]* 2.3 Write property test for low confidence clarification
+    - **Property 2: Low Confidence Clarification**
+    - **Validates: Requirements 1.3**
+  - [ ] 2.4 Implement intent synonym normalization
+    - Map variations to canonical intents
+    - _Requirements: 1.4_
+  - [ ]* 2.5 Write property test for intent synonym normalization
+    - **Property 3: Intent Synonym Normalization**
+    - **Validates: Requirements 1.4**
+
+- [ ] 3. Implement Entity Extractor
+  - [ ] 3.1 Create EntityExtractor class
+    - Extract entities from commands based on intent
+    - Return entity type, value, and confidence
+    - _Requirements: 1.1_
+
+- [ ] 4. Implement Reference Resolver
+  - [ ] 4.1 Create ReferenceResolver class
+    - Detect pronouns and references in text
+    - Resolve references using conversation context
+    - _Requirements: 4.3_
+  - [ ]* 4.2 Write property test for pronoun reference resolution
+    - **Property 13: Pronoun Reference Resolution**
+    - **Validates: Requirements 4.3**
+
+- [ ] 5. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 6. Implement Task Router and Model Selector
+  - [ ] 6.1 Create TaskRouter class
+    - Classify tasks by type and complexity
+    - Determine internet requirement
+    - _Requirements: 2.1, 2.3, 2.4_
+  - [ ] 6.2 Create ModelSelector class
+    - Select model based on task and connectivity
+    - Prefer coding models for code tasks
+    - Use local models for simple tasks
+    - _Requirements: 2.1, 2.2, 2.3, 2.4_
+  - [ ]* 6.3 Write property test for connectivity-based model routing
+    - **Property 4: Connectivity-Based Model Routing**
+    - **Validates: Requirements 2.1, 2.2**
+  - [ ]* 6.4 Write property test for code task model selection
+    - **Property 5: Code Task Model Selection**
+    - **Validates: Requirements 2.3**
+  - [ ]* 6.5 Write property test for simple task local routing
+    - **Property 6: Simple Task Local Routing**
+    - **Validates: Requirements 2.4**
+  - [ ] 6.6 Implement routing decision logging
+    - Log model selection with reason
+    - _Requirements: 2.5_
+  - [ ]* 6.7 Write property test for routing decision logging
+    - **Property 7: Routing Decision Logging**
+    - **Validates: Requirements 2.5**
+
+- [ ] 7. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 8. Implement Tool Caller
+  - [ ] 8.1 Create ToolCaller class
+    - Parse tool calls from LLM output
+    - Validate parameters against schema
+    - Execute tools and handle results
+    - _Requirements: 3.1, 3.2, 3.3_
+  - [ ]* 8.2 Write property test for tool parameter validation before execution
+    - **Property 8: Tool Parameter Validation Before Execution**
+    - **Validates: Requirements 3.2**
+  - [ ]* 8.3 Write property test for tool result incorporation
+    - **Property 9: Tool Result Incorporation**
+    - **Validates: Requirements 3.3**
+  - [ ] 8.4 Implement tool call retry
+    - Retry with corrected parameters on failure
+    - _Requirements: 3.4_
+  - [ ] 8.5 Implement tool call serialization
+    - JSON encode/decode matching schema
+    - _Requirements: 3.5_
+  - [ ]* 8.6 Write property test for tool call serialization round-trip
+    - **Property 10: Tool Call Serialization Round-Trip**
+    - **Validates: Requirements 3.5**
+
+- [ ] 9. Implement Conversation Memory
+  - [ ] 9.1 Create ConversationMemory class
+    - Implement addMessage() and getContext()
+    - Track token count for context
+    - _Requirements: 4.1, 4.4_
+  - [ ]* 9.2 Write property test for context history inclusion
+    - **Property 11: Context History Inclusion**
+    - **Validates: Requirements 4.1**
+  - [ ]* 9.3 Write property test for history persistence fields
+    - **Property 14: History Persistence Fields**
+    - **Validates: Requirements 4.4**
+  - [ ] 9.4 Implement context summarization
+    - Summarize when exceeding token limit
+    - _Requirements: 4.2_
+  - [ ]* 9.5 Write property test for context token limit enforcement
+    - **Property 12: Context Token Limit Enforcement**
+    - **Validates: Requirements 4.2**
+  - [ ] 9.6 Implement history loading
+    - Load recent context for new sessions
+    - _Requirements: 4.5_
+
+- [ ] 10. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 11. Implement Response Generator
+  - [ ] 11.1 Create ResponseGenerator class
+    - Generate responses with persona prompt
+    - Support English and Hindi output
+    - _Requirements: 5.1, 5.2, 5.3_
+  - [ ]* 11.2 Write property test for persona prompt application
+    - **Property 15: Persona Prompt Application**
+    - **Validates: Requirements 5.1**
+  - [ ]* 11.3 Write property test for language-appropriate response
+    - **Property 16: Language-Appropriate Response**
+    - **Validates: Requirements 5.2, 5.3**
+
+- [ ] 12. Implement Prompt Template Manager
+  - [ ] 12.1 Create PromptTemplateManager class
+    - Load templates from configurable store
+    - Render templates with variable injection
+    - _Requirements: 6.1, 6.2, 6.3_
+  - [ ]* 12.2 Write property test for template variable injection
+    - **Property 17: Template Variable Injection**
+    - **Validates: Requirements 6.3**
+  - [ ] 12.3 Implement fallback for invalid templates
+    - Fall back to default and log error
+    - _Requirements: 6.4_
+  - [ ]* 12.4 Write property test for invalid template fallback
+    - **Property 18: Invalid Template Fallback**
+    - **Validates: Requirements 6.4**
+  - [ ] 12.5 Implement template serialization
+    - JSON with version metadata
+    - _Requirements: 6.5_
+  - [ ]* 12.6 Write property test for template serialization round-trip
+    - **Property 19: Template Serialization Round-Trip**
+    - **Validates: Requirements 6.5**
+
+- [ ] 13. Wire up AI/LLM System
+  - [ ] 13.1 Create AISystem main class
+    - Wire together all components (Intent, Entity, Reference, Router, Tools, Memory, Response, Templates)
+    - Implement main processCommand() pipeline
+    - _Requirements: All_
+  - [ ]* 13.2 Write integration tests for full AI pipeline
+    - Test intent recognition to response generation
+    - Test tool calling flows
+    - Test model fallback scenarios
+    - _Requirements: All_
+
+- [ ] 14. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

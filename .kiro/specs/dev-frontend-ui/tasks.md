@@ -1,0 +1,236 @@
+# Implementation Plan: Dev Frontend UI System
+
+- [ ] 1. Set up project structure and dependencies
+  - [ ] 1.1 Initialize Next.js project with UI dependencies
+    - Create package.json with next, react, tailwindcss, framer-motion, three, @react-three/fiber
+    - Add lenis and gsap (with ScrollTrigger plugin) for smooth scrolling
+    - Set up fast-check and @testing-library/react for testing
+    - Configure Tailwind CSS
+    - _Requirements: 1.1, 2.1, 3.1_
+  - [ ] 1.2 Set up Tauri for desktop app
+    - Initialize Tauri project wrapping Next.js
+    - Configure system tray and window management
+    - _Requirements: 6.1, 6.3_
+  - [ ] 1.3 Define TypeScript interfaces
+    - Create interfaces for Message, ActivityEntry, UserPreferences, Permission
+    - Define component props types
+    - Add LenisConfig, ScrollService, ScrollTriggerConfig interfaces
+    - _Requirements: 3.1, 4.1, 5.1, 7.1_
+
+- [ ] 2. Implement Scroll & Animation Service
+  - [ ] 2.1 Create Lenis smooth scroll service
+    - Initialize Lenis with optimal config (duration: 1.2, smoothWheel: true)
+    - Integrate with React lifecycle (useEffect cleanup)
+    - _Requirements: 3.1, 3.4_
+  - [ ] 2.2 Integrate GSAP ScrollTrigger with Lenis
+    - Register ScrollTrigger plugin
+    - Sync Lenis scroll position with GSAP
+    - _Requirements: 3.1, 3.4_
+  - [ ]* 2.3 Write property test for smooth scroll initialization
+    - **Property 22: Smooth Scroll Initialization**
+    - **Validates: Requirements 3.1, 3.4**
+  - [ ] 2.4 Create scroll animation utilities
+    - Parallax helper functions
+    - Fade-in on scroll animations
+    - Pinned section utilities
+    - _Requirements: 3.1, 3.4_
+  - [ ]* 2.5 Write property test for scroll-triggered animations
+    - **Property 23: Scroll-triggered Animations**
+    - **Validates: Requirements 3.1, 3.4**
+
+- [ ] 3. Implement Avatar Component
+  - [ ] 3.1 Create Avatar component with Three.js/R3F
+    - Implement 3D or 2D animated character
+    - Create state machine for animations
+    - _Requirements: 1.1_
+  - [ ] 3.2 Implement state-based animations
+    - Idle, listening, speaking, processing, error states
+    - _Requirements: 1.2, 1.3, 1.4, 1.5_
+  - [ ]* 3.3 Write property test for avatar state-animation mapping
+    - **Property 1: Avatar State-Animation Mapping**
+    - **Validates: Requirements 1.2, 1.3, 1.4, 1.5**
+
+- [ ] 4. Implement Command Bar
+  - [ ] 4.1 Create CommandBar component
+    - Text input with Enter key submission
+    - Microphone button for voice mode
+    - _Requirements: 2.1, 2.2_
+  - [ ]* 4.2 Write property test for voice mode activation
+    - **Property 2: Voice Mode Activation**
+    - **Validates: Requirements 2.1, 2.3**
+  - [ ]* 4.3 Write property test for text command submission
+    - **Property 3: Text Command Submission**
+    - **Validates: Requirements 2.2, 2.4**
+  - [ ] 4.4 Implement voice indicator
+    - Waveform or pulse animation during voice input
+    - _Requirements: 2.3_
+  - [ ] 4.5 Implement command history navigation
+    - Up/down arrow key navigation
+    - _Requirements: 2.5_
+  - [ ]* 4.6 Write property test for command history navigation
+    - **Property 4: Command History Navigation**
+    - **Validates: Requirements 2.5**
+
+- [ ] 5. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 6. Implement Response Feed
+  - [ ] 6.1 Create ResponseFeed component
+    - Chat-style message display with Lenis smooth scroll
+    - User and assistant message styling
+    - _Requirements: 3.1_
+  - [ ] 6.2 Implement code block rendering
+    - Syntax highlighting with language detection
+    - _Requirements: 3.2_
+  - [ ]* 6.3 Write property test for code block syntax highlighting
+    - **Property 5: Code Block Syntax Highlighting**
+    - **Validates: Requirements 3.2**
+  - [ ] 6.4 Implement structured data rendering
+    - Tables and cards for objects/arrays
+    - _Requirements: 3.3_
+  - [ ]* 6.5 Write property test for structured data formatting
+    - **Property 6: Structured Data Formatting**
+    - **Validates: Requirements 3.3**
+  - [ ] 6.6 Implement expandable sections
+    - Collapsible for long responses with GSAP animations
+    - _Requirements: 3.4_
+  - [ ] 6.7 Add timestamps to messages
+    - _Requirements: 3.5_
+  - [ ]* 6.8 Write property test for message timestamp display
+    - **Property 7: Message Timestamp Display**
+    - **Validates: Requirements 3.5**
+
+- [ ] 7. Implement Settings Panel
+  - [ ] 7.1 Create SettingsPanel component
+    - Categorized preference options
+    - _Requirements: 4.1_
+  - [ ] 7.2 Implement language preference
+    - Immediate UI language update
+    - _Requirements: 4.2_
+  - [ ]* 7.3 Write property test for language preference immediate update
+    - **Property 8: Language Preference Immediate Update**
+    - **Validates: Requirements 4.2**
+  - [ ] 7.4 Implement voice settings
+    - TTS voice preview
+    - _Requirements: 4.3_
+  - [ ] 7.5 Implement wake word configuration
+    - Validation and save
+    - _Requirements: 4.4_
+  - [ ] 7.6 Implement settings persistence
+    - Save to backend API
+    - _Requirements: 4.5_
+  - [ ]* 7.7 Write property test for settings backend persistence
+    - **Property 9: Settings Backend Persistence**
+    - **Validates: Requirements 4.5**
+
+- [ ] 8. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 9. Implement Permission Panel
+  - [ ] 9.1 Create PermissionPanel component
+    - Display all permission categories
+    - Show current grant status
+    - _Requirements: 5.1_
+  - [ ]* 9.2 Write property test for permission category completeness
+    - **Property 10: Permission Category Completeness**
+    - **Validates: Requirements 5.1**
+  - [ ] 9.3 Implement permission grant UI
+    - Explanation modal before grant
+    - _Requirements: 5.2_
+  - [ ]* 9.4 Write property test for permission grant explanation
+    - **Property 11: Permission Grant Explanation**
+    - **Validates: Requirements 5.2**
+  - [ ] 9.5 Implement permission revocation
+    - Confirmation dialog and immediate update
+    - _Requirements: 5.3_
+  - [ ]* 9.6 Write property test for permission revocation confirmation
+    - **Property 12: Permission Revocation Confirmation**
+    - **Validates: Requirements 5.3**
+  - [ ] 9.7 Implement permission request modal
+    - Grant/deny options for new requests
+    - _Requirements: 5.4_
+
+- [ ] 10. Implement WebSocket Client
+  - [ ] 10.1 Create WebSocket client service
+    - Connection management with reconnection
+    - Message serialization/deserialization
+    - _Requirements: 5.5_
+  - [ ] 10.2 Implement real-time permission updates
+    - Update UI on WebSocket permission changes
+    - _Requirements: 5.5_
+  - [ ]* 10.3 Write property test for real-time permission updates
+    - **Property 13: Real-time Permission Updates**
+    - **Validates: Requirements 5.5**
+
+- [ ] 11. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 12. Implement Activity Feed
+  - [ ] 12.1 Create ActivityFeed component
+    - Real-time entry display with scroll animations
+    - _Requirements: 7.1_
+  - [ ]* 12.2 Write property test for activity feed real-time updates
+    - **Property 17: Activity Feed Real-time Updates**
+    - **Validates: Requirements 7.1**
+  - [ ] 12.3 Implement activity entry display
+    - Command, timestamp, status, result summary
+    - _Requirements: 7.2_
+  - [ ]* 12.4 Write property test for activity entry required fields
+    - **Property 18: Activity Entry Required Fields**
+    - **Validates: Requirements 7.2**
+  - [ ] 12.5 Implement entry expansion
+    - Click to show full details with GSAP animation
+    - _Requirements: 7.3_
+  - [ ]* 12.6 Write property test for activity entry expansion
+    - **Property 19: Activity Entry Expansion**
+    - **Validates: Requirements 7.3**
+  - [ ] 12.7 Implement activity filtering
+    - Filter by date, type, status
+    - _Requirements: 7.4_
+  - [ ]* 12.8 Write property test for activity filter application
+    - **Property 20: Activity Filter Application**
+    - **Validates: Requirements 7.4**
+  - [ ] 12.9 Implement JSON parsing for activity data
+    - _Requirements: 7.5_
+  - [ ]* 12.10 Write property test for activity JSON parsing
+    - **Property 21: Activity JSON Parsing**
+    - **Validates: Requirements 7.5**
+
+- [ ] 13. Implement Tauri Desktop Features
+  - [ ] 13.1 Implement system tray
+    - Quick actions menu on click
+    - _Requirements: 6.3_
+  - [ ]* 13.2 Write property test for system tray menu display
+    - **Property 15: System Tray Menu Display**
+    - **Validates: Requirements 6.3**
+  - [ ] 13.3 Implement background wake word listening
+    - Continue listening when minimized
+    - _Requirements: 6.2_
+  - [ ]* 13.4 Write property test for background wake word listening
+    - **Property 14: Background Wake Word Listening**
+    - **Validates: Requirements 6.2**
+  - [ ] 13.5 Implement update checker
+    - Check for updates on start
+    - _Requirements: 6.4_
+  - [ ] 13.6 Implement offline status indicator
+    - Show offline status and available features
+    - _Requirements: 6.5_
+  - [ ]* 13.7 Write property test for offline status indication
+    - **Property 16: Offline Status Indication**
+    - **Validates: Requirements 6.5**
+
+- [ ] 14. Wire up Dashboard Page
+  - [ ] 14.1 Create main Dashboard page
+    - Integrate Avatar, CommandBar, ResponseFeed, ActivityFeed
+    - Initialize Lenis smooth scroll at page level
+    - Set up global state management
+    - _Requirements: All_
+  - [ ]* 14.2 Write integration tests for full UI
+    - Test command submission flow
+    - Test settings changes
+    - Test permission management
+    - Test scroll behavior and animations
+    - _Requirements: All_
+
+- [ ] 15. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

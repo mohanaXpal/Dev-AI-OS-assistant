@@ -1,0 +1,193 @@
+# Implementation Plan: Dev Auth Backend System
+
+- [ ] 1. Set up project structure and dependencies
+  - [ ] 1.1 Initialize NestJS project with auth dependencies
+    - Create package.json with @nestjs/passport, passport-google-oauth20, passport-github2, @nestjs/jwt, mongoose
+    - Set up fast-check for property testing
+    - Configure project structure (src/modules/)
+    - _Requirements: 1.1, 1.2, 2.1_
+  - [ ] 1.2 Configure MongoDB connection
+    - Set up Mongoose schemas for User, Session, Permission, CommandLog
+    - Configure connection with environment variables
+    - _Requirements: 4.1, 4.2_
+  - [ ] 1.3 Define core TypeScript interfaces
+    - Create interfaces for User, Session, Permission, TokenPair
+    - Define DTOs for API requests/responses
+    - _Requirements: 1.3, 2.5, 3.2_
+
+- [ ] 2. Implement OAuth Handler
+  - [ ] 2.1 Create OAuth module with Google strategy
+    - Implement Google OAuth redirect URL generation
+    - Handle Google callback and token validation
+    - _Requirements: 1.1_
+  - [ ] 2.2 Add GitHub OAuth strategy
+    - Implement GitHub OAuth redirect URL generation
+    - Handle GitHub callback and token validation
+    - _Requirements: 1.2_
+  - [ ]* 2.3 Write property test for OAuth redirect URL generation
+    - **Property 1: OAuth Redirect URL Generation**
+    - **Validates: Requirements 1.1, 1.2**
+  - [ ] 2.4 Implement user creation/update on OAuth callback
+    - Create or update user record from OAuth profile
+    - _Requirements: 1.3_
+  - [ ]* 2.5 Write property test for failed auth error response
+    - **Property 3: Failed Auth Error Response**
+    - **Validates: Requirements 1.5**
+
+- [ ] 3. Implement JWT Service
+  - [ ] 3.1 Create JWTService class
+    - Implement generateTokenPair() for access and refresh tokens
+    - Implement verifyAccessToken() and verifyRefreshToken()
+    - _Requirements: 1.4, 2.3_
+  - [ ]* 3.2 Write property test for successful auth token issuance
+    - **Property 2: Successful Auth Token Issuance**
+    - **Validates: Requirements 1.4**
+  - [ ] 3.3 Implement refresh token rotation
+    - Issue new refresh token on use, invalidate old
+    - _Requirements: 2.1, 2.4_
+  - [ ]* 3.4 Write property test for refresh token rotation
+    - **Property 4: Refresh Token Rotation**
+    - **Validates: Requirements 2.1, 2.4**
+  - [ ]* 3.5 Write property test for JWT validation on protected endpoints
+    - **Property 6: JWT Validation on Protected Endpoints**
+    - **Validates: Requirements 2.3**
+
+- [ ] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 5. Implement Session Manager
+  - [ ] 5.1 Create SessionManager class
+    - Implement createSession() with device info
+    - Implement getSession() and updateActivity()
+    - _Requirements: 2.1, 2.2_
+  - [ ] 5.2 Implement logout functionality
+    - Invalidate refresh token and clear session
+    - _Requirements: 2.2_
+  - [ ]* 5.3 Write property test for logout token invalidation
+    - **Property 5: Logout Token Invalidation**
+    - **Validates: Requirements 2.2**
+  - [ ] 5.4 Implement session serialization
+    - JSON encode/decode for secure storage
+    - _Requirements: 2.5_
+  - [ ]* 5.5 Write property test for session serialization round-trip
+    - **Property 7: Session Serialization Round-Trip**
+    - **Validates: Requirements 2.5**
+
+- [ ] 6. Implement Permission Manager
+  - [ ] 6.1 Create PermissionManager class
+    - Implement grantPermission() with storage
+    - Implement revokePermission() with notification
+    - _Requirements: 3.2, 3.3_
+  - [ ]* 6.2 Write property test for permission grant persistence
+    - **Property 8: Permission Grant Persistence**
+    - **Validates: Requirements 3.2**
+  - [ ]* 6.3 Write property test for permission revocation completeness
+    - **Property 9: Permission Revocation Completeness**
+    - **Validates: Requirements 3.3**
+  - [ ] 6.4 Implement permission querying
+    - Return complete permission set for user
+    - _Requirements: 3.4_
+  - [ ]* 6.5 Write property test for permission query completeness
+    - **Property 10: Permission Query Completeness**
+    - **Validates: Requirements 3.4**
+
+- [ ] 7. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 8. Implement User Service
+  - [ ] 8.1 Create UserService class
+    - Implement findById(), findByEmail(), findOrCreate()
+    - Implement updatePreferences() with immediate persistence
+    - _Requirements: 4.1_
+  - [ ]* 8.2 Write property test for preference persistence
+    - **Property 11: Preference Persistence**
+    - **Validates: Requirements 4.1**
+  - [ ] 8.3 Implement data export
+    - Generate complete user data export
+    - _Requirements: 4.4_
+  - [ ]* 8.4 Write property test for user data export completeness
+    - **Property 14: User Data Export Completeness**
+    - **Validates: Requirements 4.4**
+  - [ ] 8.5 Implement account deletion
+    - Remove all user data
+    - _Requirements: 4.5_
+
+- [ ] 9. Implement Command Logger
+  - [ ] 9.1 Create CommandLogger class
+    - Implement log() with required fields
+    - Implement query() with pagination and date filtering
+    - _Requirements: 4.2, 4.3_
+  - [ ]* 9.2 Write property test for command log entry completeness
+    - **Property 12: Command Log Entry Completeness**
+    - **Validates: Requirements 4.2**
+  - [ ]* 9.3 Write property test for command history date range filtering
+    - **Property 13: Command History Date Range Filtering**
+    - **Validates: Requirements 4.3**
+
+- [ ] 10. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 11. Implement WebSocket Server
+  - [ ] 11.1 Create WebSocket gateway
+    - Handle client connections with authentication
+    - Implement broadcast to user's connected clients
+    - _Requirements: 5.1, 5.2, 5.3_
+  - [ ]* 11.2 Write property test for permission change broadcast
+    - **Property 15: Permission Change Broadcast**
+    - **Validates: Requirements 5.2**
+  - [ ] 11.3 Implement message queuing
+    - Queue messages during disconnection
+    - Deliver on reconnection
+    - _Requirements: 5.4_
+  - [ ]* 11.4 Write property test for message queue delivery
+    - **Property 16: Message Queue Delivery**
+    - **Validates: Requirements 5.4**
+  - [ ] 11.5 Implement message serialization
+    - JSON format with type headers
+    - _Requirements: 5.5_
+  - [ ]* 11.6 Write property test for WebSocket message format
+    - **Property 17: WebSocket Message Format**
+    - **Validates: Requirements 5.5**
+
+- [ ] 12. Implement Security Services
+  - [ ] 12.1 Create Rate Limiter
+    - Implement request rate limiting
+    - Return 429 on limit exceeded
+    - _Requirements: 6.2_
+  - [ ]* 12.2 Write property test for rate limit enforcement
+    - **Property 19: Rate Limit Enforcement**
+    - **Validates: Requirements 6.2**
+  - [ ] 12.3 Configure CORS
+    - Whitelist allowed origins
+    - _Requirements: 6.5_
+  - [ ]* 12.4 Write property test for CORS origin validation
+    - **Property 21: CORS Origin Validation**
+    - **Validates: Requirements 6.5**
+  - [ ] 12.5 Implement request logging
+    - Log requests excluding sensitive fields
+    - _Requirements: 6.4_
+  - [ ]* 12.6 Write property test for sensitive data exclusion from logs
+    - **Property 20: Sensitive Data Exclusion from Logs**
+    - **Validates: Requirements 6.4**
+  - [ ] 12.7 Implement auth guard
+    - Return 401 for unauthenticated requests
+    - _Requirements: 6.1_
+  - [ ]* 12.8 Write property test for unauthenticated request rejection
+    - **Property 18: Unauthenticated Request Rejection**
+    - **Validates: Requirements 6.1**
+
+- [ ] 13. Wire up API endpoints
+  - [ ] 13.1 Create REST API controllers
+    - Auth endpoints (login, logout, refresh)
+    - User endpoints (profile, preferences)
+    - Permission endpoints (list, grant, revoke)
+    - Command history endpoints
+    - _Requirements: All_
+  - [ ]* 13.2 Write integration tests for full API
+    - Test OAuth flow
+    - Test permission management
+    - Test WebSocket communication
+    - _Requirements: All_
+
+- [ ] 14. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

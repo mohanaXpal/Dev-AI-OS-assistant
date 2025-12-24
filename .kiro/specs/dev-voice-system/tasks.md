@@ -1,0 +1,132 @@
+# Implementation Plan: Dev Voice System
+
+- [ ] 1. Set up project structure and dependencies
+  - [ ] 1.1 Initialize Python project with voice dependencies
+    - Create requirements.txt with whisper, pyttsx3, numpy, sounddevice
+    - Set up pytest and hypothesis for testing
+    - Configure project structure (src/, tests/)
+    - _Requirements: 1.1, 3.1, 5.1_
+  - [ ] 1.2 Define core data classes and enums
+    - Create AudioSegment, TranscriptionResult, SpeechOutput dataclasses
+    - Define Language, ListeningState, ModelMode enums
+    - _Requirements: 1.2, 1.3, 4.1_
+
+- [ ] 2. Implement Audio Capture
+  - [ ] 2.1 Create AudioCapture class
+    - Implement capture() method with configurable timeout
+    - Add silence detection for end-of-speech
+    - Implement quality validation
+    - _Requirements: 1.1, 1.5_
+  - [ ]* 2.2 Write property test for poor audio quality error handling
+    - **Property 2: Poor Audio Quality Error Handling**
+    - **Validates: Requirements 1.5**
+
+- [ ] 3. Implement Language Detector
+  - [ ] 3.1 Create LanguageDetector class
+    - Implement detect_from_audio() using fastText or similar
+    - Add confidence scoring
+    - Handle language override setting
+    - _Requirements: 4.1, 4.2, 4.3, 4.4_
+  - [ ]* 3.2 Write property test for low confidence language fallback
+    - **Property 8: Low Confidence Language Fallback**
+    - **Validates: Requirements 4.3**
+  - [ ]* 3.3 Write property test for explicit language override
+    - **Property 9: Explicit Language Override**
+    - **Validates: Requirements 4.4**
+  - [ ] 3.4 Implement language preference persistence
+    - Store preference to user profile
+    - _Requirements: 4.5_
+  - [ ]* 3.5 Write property test for language preference round-trip
+    - **Property 10: Language Preference Persistence Round-Trip**
+    - **Validates: Requirements 4.5**
+
+- [ ] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 5. Implement Speech-to-Text Engine
+  - [ ] 5.1 Create SpeechToTextEngine class
+    - Integrate Whisper model for transcription
+    - Implement language-based model routing
+    - Handle Hinglish code-switching
+    - _Requirements: 1.1, 1.2, 1.3, 1.4_
+  - [ ]* 5.2 Write property test for language-based STT model routing
+    - **Property 1: Language-Based STT Model Routing**
+    - **Validates: Requirements 1.2, 1.3**
+
+- [ ] 6. Implement Wake Word Detector
+  - [ ] 6.1 Create WakeWordDetector class
+    - Implement lightweight always-on listening
+    - Add state machine for standby/active transitions
+    - Support custom wake word configuration
+    - _Requirements: 2.1, 2.2, 2.3, 2.5_
+  - [ ]* 6.2 Write property test for wake word state transition
+    - **Property 3: Wake Word State Transition**
+    - **Validates: Requirements 2.2**
+  - [ ] 6.3 Implement silence timeout
+    - Return to standby after configurable timeout
+    - _Requirements: 2.4_
+  - [ ]* 6.4 Write property test for silence timeout state transition
+    - **Property 4: Silence Timeout State Transition**
+    - **Validates: Requirements 2.4**
+  - [ ]* 6.5 Write property test for custom wake word configuration
+    - **Property 5: Custom Wake Word Configuration**
+    - **Validates: Requirements 2.5**
+
+- [ ] 7. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 8. Implement Text-to-Speech Engine
+  - [ ] 8.1 Create TextToSpeechEngine class
+    - Integrate pyttsx3 for local TTS
+    - Implement language-based voice selection
+    - Configure Dev persona voice settings
+    - _Requirements: 3.1, 3.2, 3.3_
+  - [ ]* 8.2 Write property test for language-based TTS voice selection
+    - **Property 6: Language-Based TTS Voice Selection**
+    - **Validates: Requirements 3.2, 3.3**
+
+- [ ] 9. Implement Audio Player
+  - [ ] 9.1 Create AudioPlayer class
+    - Implement play() with system audio output
+    - Add interrupt support for stopping playback
+    - Handle playback state tracking
+    - _Requirements: 3.4, 3.5_
+  - [ ]* 9.2 Write property test for playback interrupt handling
+    - **Property 7: Playback Interrupt Handling**
+    - **Validates: Requirements 3.5**
+
+- [ ] 10. Implement Model Manager and Connectivity Monitor
+  - [ ] 10.1 Create ConnectivityMonitor class
+    - Implement periodic connectivity checks
+    - Add callback for connectivity changes
+    - _Requirements: 5.3, 5.5_
+  - [ ] 10.2 Create ModelManager class
+    - Implement online/offline model switching
+    - Route to appropriate STT/TTS models based on connectivity
+    - _Requirements: 5.1, 5.2_
+  - [ ]* 10.3 Write property test for offline model fallback
+    - **Property 11: Offline Model Fallback**
+    - **Validates: Requirements 5.1, 5.2**
+  - [ ]* 10.4 Write property test for connectivity-based model switching
+    - **Property 12: Connectivity-Based Model Switching**
+    - **Validates: Requirements 5.3, 5.5**
+  - [ ] 10.5 Implement offline notification
+    - Notify user when switching to offline mode
+    - _Requirements: 5.4_
+  - [ ]* 10.6 Write property test for offline notification
+    - **Property 13: Offline Notification**
+    - **Validates: Requirements 5.4**
+
+- [ ] 11. Wire up Voice System
+  - [ ] 11.1 Create VoiceSystem main class
+    - Wire together all components (WakeWord, Capture, Language, STT, TTS, Player, Models)
+    - Implement main voice processing pipeline
+    - _Requirements: All_
+  - [ ]* 11.2 Write integration tests for full voice pipeline
+    - Test wake word to transcription flow
+    - Test TTS playback with interrupt
+    - Test online/offline transitions
+    - _Requirements: All_
+
+- [ ] 12. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

@@ -1,0 +1,147 @@
+# Implementation Plan: Dev Assistant Core
+
+- [ ] 1. Set up project structure and core interfaces
+  - [ ] 1.1 Initialize TypeScript project with LangChain dependencies
+    - Create package.json with langchain, fast-check, and MongoDB dependencies
+    - Configure tsconfig.json for strict mode
+    - Set up ESLint and Prettier
+    - _Requirements: 2.1, 2.4_
+  - [ ] 1.2 Define core TypeScript interfaces
+    - Create interfaces for Command, Intent, Entity, Permission, Skill, Agent
+    - Define ExecutionContext, ExecutionResult, ExecutionState types
+    - _Requirements: 1.1, 2.1, 4.1_
+  - [ ]* 1.3 Write property test for context serialization round-trip
+    - **Property 1: Context Serialization Round-Trip**
+    - **Validates: Requirements 3.5**
+
+- [ ] 2. Implement Command Parser
+  - [ ] 2.1 Create CommandParser class
+    - Implement parse() method to normalize raw input
+    - Handle voice and text input types
+    - Extract language detection metadata
+    - _Requirements: 1.1_
+  - [ ]* 2.2 Write property test for intent resolution consistency
+    - **Property 3: Intent Resolution Consistency**
+    - **Validates: Requirements 1.1**
+
+- [ ] 3. Implement Intent Resolver with LLM integration
+  - [ ] 3.1 Create IntentResolver class
+    - Integrate with LangChain for LLM-based intent extraction
+    - Implement confidence scoring and ranking
+    - Handle ambiguous intent detection
+    - _Requirements: 1.1, 1.2_
+  - [ ]* 3.2 Write property test for highest confidence selection
+    - **Property 3: Intent Resolution Consistency** (if not covered above)
+    - **Validates: Requirements 1.1**
+  - [ ]* 3.3 Write property test for ambiguous command handling
+    - **Property 4: Ambiguous Command Handling**
+    - **Validates: Requirements 1.2**
+  - [ ] 3.4 Implement context reference resolution
+    - Create ReferenceResolver for pronoun handling
+    - Integrate with conversation context
+    - _Requirements: 1.3_
+  - [ ]* 3.5 Write property test for context reference resolution
+    - **Property 5: Context Reference Resolution**
+    - **Validates: Requirements 1.3**
+
+- [ ] 4. Implement Permission Validator
+  - [ ] 4.1 Create PermissionValidator class
+    - Implement validate() method against user permission set
+    - Return missing permissions on failure
+    - Handle elevated permission detection
+    - _Requirements: 1.4, 1.5_
+  - [ ]* 4.2 Write property test for permission enforcement
+    - **Property 2: Permission Enforcement Invariant**
+    - **Validates: Requirements 1.4, 1.5, 4.3**
+
+- [ ] 5. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 6. Implement Agent Coordinator
+  - [ ] 6.1 Create AgentCoordinator class with LangChain agents
+    - Implement execute() method for multi-agent orchestration
+    - Create message bus for inter-agent communication
+    - Handle agent result aggregation
+    - _Requirements: 2.1, 2.2, 2.4_
+  - [ ]* 6.2 Write property test for multi-skill decomposition
+    - **Property 6: Multi-Skill Decomposition**
+    - **Validates: Requirements 2.1**
+  - [ ] 6.3 Implement execution state management
+    - Create ExecutionState tracking for multi-step tasks
+    - Support interruption and resumption
+    - _Requirements: 2.5_
+  - [ ]* 6.4 Write property test for execution state persistence
+    - **Property 7: Execution State Persistence**
+    - **Validates: Requirements 2.5**
+  - [ ] 6.5 Implement agent failure handling
+    - Create graceful failure isolation
+    - Report failures to user without crashing
+    - _Requirements: 2.3_
+  - [ ]* 6.6 Write property test for agent failure isolation
+    - **Property 8: Agent Failure Isolation**
+    - **Validates: Requirements 2.3**
+
+- [ ] 7. Implement Memory Manager
+  - [ ] 7.1 Create MemoryManager class
+    - Implement short-term memory (session-based)
+    - Implement long-term memory with MongoDB persistence
+    - Create context retrieval methods
+    - _Requirements: 3.1, 3.2, 3.3_
+  - [ ]* 7.2 Write property test for short-term memory storage
+    - **Property 9: Short-Term Memory Storage**
+    - **Validates: Requirements 3.1**
+  - [ ] 7.3 Implement forget functionality
+    - Create method to remove specified data from memory
+    - Handle both short-term and long-term deletion
+    - _Requirements: 3.4_
+  - [ ]* 7.4 Write property test for memory deletion completeness
+    - **Property 10: Memory Deletion Completeness**
+    - **Validates: Requirements 3.4**
+
+- [ ] 8. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 9. Implement Skill Registry
+  - [ ] 9.1 Create SkillRegistry class
+    - Implement register() with manifest validation
+    - Create skill lookup by trigger patterns
+    - Handle permission verification for skills
+    - _Requirements: 4.1, 4.2, 4.3_
+  - [ ]* 9.2 Write property test for valid plugin registration
+    - **Property 11: Valid Plugin Registration**
+    - **Validates: Requirements 4.1**
+  - [ ]* 9.3 Write property test for malformed plugin rejection
+    - **Property 12: Malformed Plugin Rejection**
+    - **Validates: Requirements 4.5**
+  - [ ] 9.4 Implement skill listing
+    - Return all registered skills with metadata
+    - _Requirements: 4.4_
+  - [ ]* 9.5 Write property test for skill listing completeness
+    - **Property 13: Skill Listing Completeness**
+    - **Validates: Requirements 4.4**
+
+- [ ] 10. Implement Response Generator
+  - [ ] 10.1 Create ResponseGenerator class
+    - Implement generate() with language support (English/Hindi)
+    - Apply Dev persona for consistent voice
+    - Support text and speech output formats
+    - _Requirements: 5.1, 5.2, 5.3, 5.4_
+  - [ ]* 10.2 Write property test for language-appropriate response
+    - **Property 14: Language-Appropriate Response**
+    - **Validates: Requirements 5.1**
+  - [ ]* 10.3 Write property test for response format support
+    - **Property 15: Response Format Support**
+    - **Validates: Requirements 5.4**
+
+- [ ] 11. Wire up Core Orchestrator
+  - [ ] 11.1 Create CoreOrchestrator main class
+    - Wire together all components (Parser, Resolver, Validator, Coordinator, Memory, Skills, Response)
+    - Implement main processCommand() pipeline
+    - _Requirements: 1.1, 1.4, 2.1, 3.3, 5.2_
+  - [ ]* 11.2 Write integration tests for full pipeline
+    - Test end-to-end command processing
+    - Test multi-agent coordination scenarios
+    - _Requirements: All_
+
+- [ ] 12. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
