@@ -15,6 +15,11 @@ import { UserService } from './modules/user/user.service';
 import dotenv from 'dotenv';
 dotenv.config();
 
+import connectDB from './config/database';
+
+// Connect to Database
+connectDB();
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 const MOCK_MODE = process.env.MOCK_MODE === 'true' || true; // Default to true for now as requested
@@ -63,6 +68,37 @@ app.post('/api/command', async (req, res) => {
     await new Promise(resolve => setTimeout(resolve, 800));
 
     const lowerCmd = command.toLowerCase();
+
+    // NEW: Live Automation Integration (Hybrid approach)
+    // If command starts with "open", try to hit the automation server
+    if (lowerCmd.startsWith('open')) {
+      try {
+        const appName = lowerCmd.replace('open', '').trim();
+        console.log(`⚡ Sending execution request to OS Layer: open_app ${appName}`);
+
+        const authResponse = await fetch('http://localhost:8000/execute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'open_app',
+            params: { app_name: appName }
+          })
+        });
+
+        if (authResponse.ok) {
+          const data = await authResponse.json() as any;
+          return res.json({
+            command: { original: command, parsed: lowerCmd },
+            response: { text: `Executed: ${data.message}`, type: 'text' },
+            execution: { success: true, mode: 'live', details: data }
+          });
+        }
+      } catch (error) {
+        console.error("OS Automation Error:", error);
+        // Fallback to mock response
+      }
+    }
+
     let responseText = MOCK_RESPONSES['default'];
 
     if (lowerCmd.includes('hello') || lowerCmd.includes('hi')) responseText = MOCK_RESPONSES['hello'];

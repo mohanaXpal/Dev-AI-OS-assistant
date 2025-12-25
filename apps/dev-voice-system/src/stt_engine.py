@@ -17,8 +17,12 @@ class SpeechToTextEngine:
     def __init__(self, use_local: bool = True):
         self.use_local = use_local
         self.model_name = "whisper"
-        # In production, would load actual Whisper model
-        # For now, mock implementation
+        self.model = None
+        if self.use_local:
+            import whisper
+            print("  Loading Whisper model (base)...")
+            self.model = whisper.load_model("base")
+            print("  Whisper model loaded.")
     
     def transcribe(self, audio_segment: AudioSegment) -> TranscriptionResult:
         """
@@ -27,26 +31,11 @@ class SpeechToTextEngine:
         Requirement 1.2-1.4: Language-based model routing and Hinglish handling
         """
         try:
+        try:
+            import numpy as np
+            
             # Determine language model to use
             language = audio_segment.language
-            
-            if language == Language.ENGLISH:
-                # Requirement 1.2: English language model
-                model = "whisper-en"
-                confidence = 0.95
-                text = self._mock_transcribe_english(audio_segment)
-            
-            elif language == Language.HINDI:
-                # Requirement 1.3: Hindi language model
-                model = "whisper-hi"
-                confidence = 0.92
-                text = self._mock_transcribe_hindi(audio_segment)
-            
-            else:  # Hinglish
-                # Requirement 1.4: Handle code-switching
-                model = "whisper-hinglish"
-                confidence = 0.90
-                text = self._mock_transcribe_hinglish(audio_segment)
             
             # Check audio quality
             if not self._validate_audio_quality(audio_segment):
@@ -56,16 +45,34 @@ class SpeechToTextEngine:
                     confidence=0.0,
                     language=language,
                     is_final=True,
-                    model=model,
+                    model=self.model_name,
                     processing_time_ms=100
                 )
+
+            # Convert bytes back to float32 numpy array
+            audio_np = np.frombuffer(audio_segment.data, dtype=np.float32)
+
+            if self.model:
+                # Transcribe
+                # We can hint language if we know it, but let's let Whisper detect or hint based on 'language' param
+                # Mapping internal Language enum to whisper codes if needed
+                lang_code = "en"
+                if language == Language.HINDI: lang_code = "hi"
+                
+                result = self.model.transcribe(audio_np, language=lang_code, fp16=False)
+                text = result["text"].strip()
+                confidence = 0.9 # Whisper doesn't give single confidence easily without segments
+            else:
+                 # Default mock if model failed to load
+                 text = "Model not loaded"
+                 confidence = 0.0
             
             return TranscriptionResult(
                 text=text,
                 confidence=confidence,
                 language=language,
                 is_final=True,
-                model=model,
+                model=self.model_name,
                 processing_time_ms=2000
             )
         
@@ -120,19 +127,37 @@ class AudioCapture:
         """
         timeout = timeout_ms or self.timeout_ms
         
-        # Mock audio capture
-        import time
-        time.sleep(0.5)  # Simulate recording
+        import sounddevice as sd
+        import numpy as np
         
-        # Create mock audio data
-        audio_data = b'\x00' * 8000  # Mock PCM audio
+        # Capture config
+        duration = timeout / 1000.0  # seconds
+        print(f"  Start recording ({duration}s)...")
         
-        return AudioSegment(
-            data=audio_data,
-            sample_rate=self.sample_rate,
-            duration_ms=float(len(audio_data) * 1000 / (self.sample_rate * 2)),
-            language=Language.ENGLISH
-        )
+        # Record
+        try:
+            recording = sd.rec(int(duration * self.sample_rate), samplerate=self.sample_rate, channels=1, dtype='float32')
+            sd.wait()
+            
+            # Convert to appropriate format/bytes if needed, usually Whisper takes np array or path.
+            # AudioSegment expects 'data' as bytes. We can store raw bytes or use a specific format.
+            # For compatibility with our model, let's keep it as bytes (PCM) or just store valid mono audio.
+            # Since we defined AudioSegment.data as bytes in line 131, let's stick to that.
+            
+            return AudioSegment(
+                data=recording.tobytes(), # raw float32 bytes
+                sample_rate=self.sample_rate,
+                duration_ms=float(len(recording) * 1000 / self.sample_rate), 
+                language=Language.ENGLISH
+            )
+        except Exception as e:
+            print(f"Error capturing audio: {e}")
+            return AudioSegment(
+                data=b'',
+                sample_rate=self.sample_rate,
+                duration_ms=0,
+                language=Language.ENGLISH
+            )
     
     def _detect_silence(self, audio: AudioSegment) -> bool:
         """Detect if audio contains significant silence"""

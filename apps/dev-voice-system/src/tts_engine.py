@@ -16,9 +16,11 @@ class TextToSpeechEngine:
     """
     
     def __init__(self):
+        import pyttsx3
         self.model_name = "pyttsx3"
         self.dev_persona_rate = 150  # Speech rate for Dev persona
-        # In production, would initialize actual pyttsx3 engine
+        self.engine = pyttsx3.init()
+        self.engine.setProperty('rate', self.dev_persona_rate)
     
     def synthesize(self, text: str, language: Language = Language.ENGLISH) -> SpeechOutput:
         """
@@ -29,16 +31,32 @@ class TextToSpeechEngine:
         try:
             # Select voice based on language
             voice_id = self._select_voice(language)
+            try:
+                voices = self.engine.getProperty('voices')
+                # Try to find a matching voice, otherwise default
+                target_voice = next((v for v in voices if language.value.lower() in v.name.lower()), voices[0])
+                self.engine.setProperty('voice', target_voice.id)
+            except:
+                pass # Default voice
             
-            # Mock synthesis
-            import time
-            time.sleep(0.1)
+            # Generate audio to temp file
+            import os
+            import tempfile
+            
+            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.wav')
+            temp_path = temp_file.name
+            temp_file.close()
+
+            self.engine.save_to_file(text, temp_path)
+            self.engine.runAndWait()
+            
+            with open(temp_path, 'rb') as f:
+                audio_data = f.read()
+            
+            os.unlink(temp_path)
             
             # Calculate duration (rough estimate)
             duration_ms = len(text.split()) * 300
-            
-            # Generate mock audio
-            audio_data = self._mock_synthesize(text, language)
             
             return SpeechOutput(
                 text=text,
@@ -111,12 +129,22 @@ class AudioPlayer:
     
     def _playback_loop(self, speech_output: SpeechOutput):
         """Simulate audio playback"""
+        import sounddevice as sd
+        import soundfile as sf
+        import io
         import time
+        
         try:
-            # Simulate playback duration
-            if speech_output.duration_ms:
-                sleep_time = speech_output.duration_ms / 1000.0
-                time.sleep(min(sleep_time, 5))  # Max 5 seconds for mock
+            if speech_output.audio_data:
+                # Read from bytes
+                data, fs = sf.read(io.BytesIO(speech_output.audio_data))
+                sd.play(data, fs)
+                sd.wait()
+            else:
+                # Fallback if no audio data
+                if speech_output.duration_ms:
+                    sleep_time = speech_output.duration_ms / 1000.0
+                    time.sleep(sleep_time)
         finally:
             self.is_playing = False
             self.current_audio = None
