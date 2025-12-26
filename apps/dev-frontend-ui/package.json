@@ -13,13 +13,16 @@
   },
   "dependencies": {
     "@studio-freight/react-lenis": "^0.0.47",
+    "@types/three": "^0.182.0",
     "axios": "^1.13.2",
     "framer-motion": "^10.16.0",
     "gsap": "^3.14.2",
     "lucide-react": "^0.263.0",
     "next": "^14.0.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "socket.io-client": "^4.8.3",
+    "three": "^0.182.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.1.0",

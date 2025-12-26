@@ -1,7 +1,7 @@
-"""
-Text-to-Speech Engine and Audio Player
-Requirements 3.1-3.5: TTS and audio playback
-"""
+import sys
+import os
+# Add parent directory to path so 'src' can be imported
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.models import Language, SpeechOutput, ListeningState
 from typing import Optional

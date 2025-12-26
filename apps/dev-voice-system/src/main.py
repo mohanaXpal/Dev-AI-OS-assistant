@@ -1,7 +1,10 @@
 """
 Dev Voice System - Main orchestration
-Integrates STT, TTS, wake word detection, and language management
 """
+import sys
+import os
+# Add parent directory to path so 'src' can be imported
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.models import Language, ListeningState, ModelMode
 from src.stt_engine import SpeechToTextEngine, AudioCapture

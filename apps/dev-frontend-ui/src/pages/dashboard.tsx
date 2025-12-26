@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import Layout from '@/components/Layout';
 import CodeBuddy from '@/components/CodeBuddy';
 import CommandHistory from '@/components/CommandHistory';
@@ -11,9 +12,15 @@ import { motion } from 'framer-motion';
 
 export default function Dashboard() {
     const [showPermissions, setShowPermissions] = useState(false);
+    const [isHydrated, setIsHydrated] = useState(false);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+    const handleRefresh = () => setRefreshTrigger(prev => prev + 1);
 
     // Check for Auth Token on Load
     React.useEffect(() => {
+        setIsHydrated(true);
+
         const params = new URLSearchParams(window.location.search);
         const token = params.get('token');
         const name = params.get('name');
@@ -36,39 +43,38 @@ export default function Dashboard() {
     return (
         <Layout>
             <PermissionModal isOpen={showPermissions} onComplete={() => setShowPermissions(false)} />
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, ease: "circOut" }}
-                className="grid grid-cols-12 gap-6 pb-20"
-            >
+            {isHydrated && (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.8, ease: "circOut" }}
+                    className="grid grid-cols-12 gap-8 pb-10 min-h-full"
+                >
 
-                {/* Left Column: Command History */}
-                <div className="col-span-12 lg:col-span-3 h-full">
-                    <CommandHistory />
-                </div>
+                    {/* Column 1 (Left): Quick Actions & System Controls */}
+                    <div className="col-span-12 lg:col-span-3 reveal">
+                        <TasksControls onCommandExecuted={handleRefresh} />
+                    </div>
 
-                {/* Center Column: Code Buddy & Activity */}
-                <div className="col-span-12 lg:col-span-6 flex flex-col gap-6 h-full">
-                    <div className="flex-1 min-h-[300px]">
-                        <CodeBuddy />
+                    {/* Column 2 (Center): Activity Log & Command History */}
+                    <div className="col-span-12 lg:col-span-6 flex flex-col gap-8 reveal">
+                        <div className="flex-1">
+                            <ActivityLog />
+                        </div>
+                        <div className="flex-1">
+                            <CommandHistory refreshTrigger={refreshTrigger} />
+                        </div>
                     </div>
-                    <div className="h-[250px] lg:h-1/3">
-                        <ActivityLog />
-                    </div>
-                </div>
 
-                {/* Right Column: Controls & Permissions */}
-                <div className="col-span-12 lg:col-span-3 flex flex-col gap-6 h-full">
-                    <div className="flex-1">
-                        <TasksControls />
+                    {/* Column 3 (Right): Code Buddy (AI Sidebar) */}
+                    <div className="col-span-12 lg:col-span-3 reveal h-full">
+                        <div className="sticky top-6 h-[calc(100vh-120px)]">
+                            <CodeBuddy onCommandExecuted={handleRefresh} />
+                        </div>
                     </div>
-                    <div className="h-1/3 hidden xl:block">
-                        <Permissions />
-                    </div>
-                </div>
 
-            </motion.div>
+                </motion.div>
+            )}
         </Layout>
     );
 }

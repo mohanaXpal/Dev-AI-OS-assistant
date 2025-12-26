@@ -26,7 +26,7 @@ export const sendCommand = async (command: string) => {
     } catch (error) {
         console.error('API Error:', error);
         return {
-            response: { text: "Error: Could not connect to JARVIS Core." },
+            response: { text: "Error: Could not connect to DEV AI Core." },
             execution: { success: false }
         };
     }

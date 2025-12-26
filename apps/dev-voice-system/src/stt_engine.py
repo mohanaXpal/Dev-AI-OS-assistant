@@ -1,7 +1,7 @@
-"""
-Speech-to-Text Engine - Audio transcription
-Requirements 1.1-1.4: STT with Whisper and language support
-"""
+import sys
+import os
+# Add parent directory to path so 'src' can be imported
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.models import Language, TranscriptionResult, AudioSegment
 from typing import Optional
@@ -30,7 +30,6 @@ class SpeechToTextEngine:
         Requirement 1.1: Transcribe speech to text with 95% accuracy for clear audio
         Requirement 1.2-1.4: Language-based model routing and Hinglish handling
         """
-        try:
         try:
             import numpy as np
             

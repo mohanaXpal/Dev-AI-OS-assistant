@@ -1,7 +1,7 @@
-"""
-Wake Word Detector - Always-on listening and activation
-Requirements 2.1-2.5: Wake word detection with state machine
-"""
+import sys
+import os
+# Add parent directory to path so 'src' can be imported
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.models import Language, ListeningState, WakeWordConfig
 from enum import Enum

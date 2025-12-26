@@ -1,0 +1,12 @@
+openai-whisper
+pyttsx3
+numpy
+sounddevice
+librosa
+requests
+soundfile
+torch
+pyaudio
+fastapi
+uvicorn
+psutil

@@ -4,7 +4,7 @@
  */
 
 import UserMongoose, { IUser } from '../../models/User';
-import CommandLogMongoose from '../../models/CommandLog';
+import CommandLogMongoose, { ICommandLog } from '../../models/CommandLog';
 import { User, UserPreferences, OAuthProfile } from '../../common/interfaces';
 
 export class UserService {
@@ -82,6 +82,20 @@ export class UserService {
   }
 
   /**
+   * Get command history for a user
+   */
+  async getCommandHistory(userId: string, limit: number = 10): Promise<ICommandLog[]> {
+    try {
+      return await CommandLogMongoose.find({ userId })
+        .sort({ createdAt: -1 })
+        .limit(limit);
+    } catch (error) {
+      console.error('Failed to get command history:', error);
+      return [];
+    }
+  }
+
+  /**
    * Export user data
    */
   async exportUserData(userId: string): Promise<object | null> {
@@ -95,6 +109,10 @@ export class UserService {
       logs: logs,
       exportedAt: new Date().toISOString()
     };
+  }
+
+  async clearCommandHistory(userId: string): Promise<void> {
+    await CommandLogMongoose.deleteMany({ userId });
   }
 }
 
