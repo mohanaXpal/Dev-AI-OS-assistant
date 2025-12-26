@@ -139,9 +139,24 @@ const CodeBuddy = ({ onCommandExecuted }: CodeBuddyProps) => {
                     <div className="w-32 h-32 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-blue-500/30 flex items-center justify-center relative z-10 shadow-neon-blue animate-float">
                         <div className="text-4xl">🤖</div>
                     </div>
-                    <div className="px-3 py-1 bg-black/60 rounded-full border border-blue-500/50 text-xs font-bold text-blue-400 shadow-neon-blue z-20 backdrop-blur-md">
+                    <button
+                        onClick={async () => {
+                            const newMute = !isMuted;
+                            setIsMuted(newMute);
+                            try {
+                                const token = localStorage.getItem('dev_token');
+                                await api.post('/command',
+                                    { command: newMute ? "mute" : "unmute" },
+                                    { headers: { 'Authorization': `Bearer ${token}` } }
+                                );
+                            } catch (e) {
+                                console.error("Failed to sync mic status:", e);
+                            }
+                        }}
+                        className="px-3 py-1 bg-black/60 rounded-full border border-blue-500/50 text-xs font-bold text-blue-400 shadow-neon-blue z-20 backdrop-blur-md hover:bg-blue-600/20 active:scale-95 transition-all cursor-pointer"
+                    >
                         DEV
-                    </div>
+                    </button>
                 </div>
 
                 {/* Interaction Area */}
@@ -175,7 +190,19 @@ const CodeBuddy = ({ onCommandExecuted }: CodeBuddyProps) => {
                                 {isLoading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Send className="w-4 h-4 text-white" />}
                             </button>
                             <button
-                                onClick={() => setIsMuted(!isMuted)}
+                                onClick={async () => {
+                                    const newMute = !isMuted;
+                                    setIsMuted(newMute);
+                                    try {
+                                        const token = localStorage.getItem('dev_token');
+                                        await api.post('/command',
+                                            { command: newMute ? "mute microphone" : "unmute microphone" },
+                                            { headers: { 'Authorization': `Bearer ${token}` } }
+                                        );
+                                    } catch (e) {
+                                        console.error("Failed to sync mic status:", e);
+                                    }
+                                }}
                                 className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${isMuted ? 'bg-red-600 hover:bg-red-500' : 'bg-slate-700/50 hover:bg-slate-600'}`}
                                 title={isMuted ? "Unmute Microphone" : "Mute Microphone"}
                             >

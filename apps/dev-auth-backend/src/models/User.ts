@@ -5,6 +5,8 @@ export interface IUser extends Document {
     email: string;
     name: string;
     avatar?: string;
+    githubToken?: string;
+    githubUsername?: string;
     preferences: {
         theme: string;
         voiceName: string;
@@ -19,6 +21,8 @@ const UserSchema: Schema = new Schema({
     email: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     avatar: { type: String },
+    githubToken: { type: String },
+    githubUsername: { type: String },
     preferences: {
         theme: { type: String, default: 'dark' },
         voiceName: { type: String, default: 'Dev' },
