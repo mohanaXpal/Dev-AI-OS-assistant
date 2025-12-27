@@ -1,4 +1,5 @@
 import type { AppProps } from 'next/app';
+import Head from 'next/head';
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReactLenis } from '@studio-freight/react-lenis';
@@ -25,6 +26,11 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <ReactLenis root>
+      <Head>
+        <title>DEV.OS | Neural OS Assistant</title>
+        <meta name="description" content="DEV.OS - The world's first AI-driven Neural Operating System." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
       <AnimatePresence mode="wait">
         <motion.div
           initial={{ opacity: 0 }}

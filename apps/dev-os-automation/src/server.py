@@ -215,6 +215,34 @@ def execute_command(req: ExecuteRequest):
             except Exception as e:
                 return ExecuteResponse(success=False, message=f"Volume control failed: {e}")
 
+        elif req.action == "set_mic_mute":
+            mute_status = req.params.get("mute", True)
+            try:
+                from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
+                from comtypes import CLSCTX_ALL
+                from ctypes import cast, POINTER
+                
+                # Get default capture device (Microphone)
+                enumerator = AudioUtilities.GetDeviceEnumerator()
+                # 1 = eCapture, 1 = eCommunications
+                mic_device = enumerator.GetDefaultAudioEndpoint(1, 1) 
+                interface = mic_device.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+                volume = cast(interface, POINTER(IAudioEndpointVolume))
+                
+                volume.SetMute(1 if mute_status else 0, None)
+                state = "muted" if mute_status else "unmuted"
+                
+                asyncio.create_task(broadcast_activity({
+                    "type": "warning" if mute_status else "success",
+                    "title": "Mic Status",
+                    "message": f"System microphone {state}"
+                }))
+                
+                return ExecuteResponse(success=True, message=f"Microphone {state}")
+            except Exception as e:
+                print(f"❌ Mic Error: {e}")
+                return ExecuteResponse(success=False, message=f"Mic control failed: {e}")
+
         elif req.action == "set_brightness":
             level = req.params.get("level", 50)
             try:

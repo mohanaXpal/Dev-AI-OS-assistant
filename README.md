@@ -1,127 +1,109 @@
-# JARVIS.OS
-> **Autonomous Neural Interface for the Next Generation of Vibe-Coding Developers.**
+# DEV.OS - The Advanced AI Operating System Assistant
 
-![System Status](https://img.shields.io/badge/System%20Status-Optimal-teal?style=for-the-badge&logo=statuspage)
-![Core](https://img.shields.io/badge/Core-v2.4-purple?style=for-the-badge&logo=react)
-![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+![DEV.OS Mockup](C:/Users/suvam/.gemini/antigravity/brain/7513d439-0c19-4ce0-ade3-e0ff9736f0bd/dev_os_mockup_1766807395022.png)
 
-**JARVIS.OS** is a modular, AI-powered operating system companion designed to revolutionize the developer workflow. It blends advanced voice control, intelligent task automation, and a futuristic, cinematic web interface to create a seamless "vibe-coding" experience.
+## 🚀 Overview
+**DEV.OS** is a next-generation AI-powered Operating System assistant designed to bridge the gap between human intent and OS execution. Built with a modular microservices architecture, it leverages cutting-edge LLMs (Gemini) to automate desktop workflows, manage system settings, and integrate seamlessly with developer tools like GitHub.
 
 ---
 
-## 🌌 System Architecture
+## 🏗️ Architecture
 
-The system is composed of **6 Interconnected Modules**, operating in harmony:
+```mermaid
+graph TD
+    UI[Frontend: Next.js] <--> BE[Backend: Express.js]
+    BE <--> LLM[AI Brain: Gemini]
+    BE <--> DB[(MongoDB)]
+    BE <--> OS[OS Automation: Python]
+    OS <--> Sys[System: Windows/macOS]
+    BE -- Socket.io --> UI
+```
 
-| Module |Tech Stack | Function |
-| :--- | :--- | :--- | 
-| **`dev-frontend-ui`** | Next.js, Tailwind, GSAP | The visual cortex. A futuristic dashboard with holographic controls. |
-| **`dev-auth-backend`** | Node.js, Express | The gateway. Handles auth, API routing, and AI command simulation. |
-| **`dev-ai-llm`** | TypeScript | The brain. Intent recognition and LLM inference engine. |
-| **`dev-assistant-core`** | TypeScript | The nervous system. Coordinates multi-agent tasks and permissions. |
-| **`dev-voice-system`** | Python | The ears & mouth. Whisper-based STT and neural TTS. |
-| **`dev-os-automation`** | Python | The hands. Secure file system and application control. |
+### Component Breakdown
+- **Frontend (`dev-frontend-ui`)**: A futuristic dashboard built with Next.js, featuring real-time system metrics and AI interaction.
+- **Backend (`dev-auth-backend`)**: The central gateway handling authentication (Google/GitHub), command processing, and AI orchestration.
+- **OS Automation (`dev-os-automation`)**: A localized Python microservice that executes low-level system commands (volume, brightness, power, file management).
+- **AI Brain**: Integrated with Google's Gemini Flash for high-performance natural language understanding and recursive action triggering.
 
 ---
 
-## ✨ Key Capabilities
-
-- **🗣️ Neural Voice Interface**: Multi-language support (English/Hindi) with wake-word detection.
-- **🧠 Contextual Intelligence**: 90%+ accuracy in intent recognition and entity extraction.
-- **🛡️ Adaptive Security**: Role-based access control with real-time risk assessment.
-- **🎨 Cinematic UI**: Glassmorphism-based design with complex orbital animations (GSAP) and smooth scrolling (Lenis).
-- **🔌 Mock Mode**: dedicated development mode to simulate AI responses without consuming API credits.
-
----
-
-## 🚀 Quick Start
-
-### 1. Prerequisites
-- **Node.js** 20+
-- **Python** 3.8+
-- **npm** or **yarn**
-
-### 2. Installation
-
-**Python Environment**
-```bash
-python -m venv env
-# Windows
-env\Scripts\activate
-# macOS/Linux
-source env/bin/activate
-
-pip install -r requirements-all.txt
-```
-
-**Node.js Modules**
-```bash
-# Install dependencies for the frontend and backend
-cd apps/dev-frontend-ui && npm install
-cd ../dev-auth-backend && npm install
-```
-
-### 3. Initialize System
-
-**Step 1: Start the API Gateway (Backend)**
-```bash
-cd apps/dev-auth-backend
-npm run dev
-# 📡 Listening on port 3001
-```
-
-**Step 2: Launch the Interface (Frontend)**
-```bash
-cd apps/dev-frontend-ui
-npm run dev
-# 🚀 Dashboard live at http://localhost:3000
-```
-
----
-
-## 🎮 Mock Mode
-
-The system currently runs in **Mock Mode** by default. This allows you to interact with JARVIS without needing active LLM or complex backend services running.
-
-**Try these commands in the prompt:**
-- `"Hello"` → JARVIS introduces himself.
-- `"Status"` → Returns system diagnostics.
-- `"Open Chrome"` → Simulates application launch.
-- `"Open VS Code"` → Simulates IDE launch.
+## 🛠️ Tech Stack
+- **Languages**: TypeScript, JavaScript, Python
+- **Frontend**: Next.js 14, React, Tailwind CSS, Framer Motion
+- **Backend**: Node.js, Express, Socket.io
+- **Database**: MongoDB Atlas (Mongoose)
+- **AI**: Google Gemini AI
+- **OS Layer**: FastAPI, PyAutoGUI, pywin32
 
 ---
 
 ## 📂 Project Structure
-
-```
-JARVIS-OS/
+```text
+.
 ├── apps/
-│   ├── dev-frontend-ui/       # Next.js Dashboard
-│   ├── dev-auth-backend/      # API Gateway & Mock Server
-│   ├── dev-ai-llm/            # AI Logic (Logic Only)
-│   ├── dev-assistant-core/    # Task Orchestration (Logic Only)
-│   ├── dev-voice-system/      # Python Voice Service
-│   └── dev-os-automation/     # Python Automation Service
-├── env/                       # Python Virtual Environment
-├── requirements-all.txt       # Python Dependencies
-└── README.md                  # System Documentation
+│   ├── dev-frontend-ui/       # Next.js Frontend
+│   ├── dev-auth-backend/      # Node.js Auth & API Gateway
+│   ├── dev-os-automation/     # Python OS Execution Layer
+│   ├── dev-voice-system/      # (Optional) Voice processing
+│   └── dev-assistant-core/    # Shared logic & Interfaces
+├── packages/                  # Shared utilities
+└── env/                       # Python Virtual Environment
 ```
 
 ---
 
-## 🛠️ Tech Stack Details
+## 🚦 Getting Started
 
-**Frontend**
-- **Framework**: Next.js 14
-- **Styling**: Tailwind CSS (Cyberpunk Theme)
-- **Animations**: GSAP (GreenSock), Framer Motion
-- **Icons**: Lucide React
+### Prerequisites
+- Node.js (v18+)
+- Python 3.10+
+- MongoDB Atlas Account
+- Google & GitHub OAuth Credentials
 
-**Backend**
-- **Runtime**: Node.js
-- **Server**: Express
-- **Security**: JWT, CORS
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/suvam-paul145/Dev-AI-OS-assistant.git
+   cd Dev-AI-OS-assistant
+   ```
+
+2. **Setup Backend**
+   ```bash
+   cd apps/dev-auth-backend
+   npm install
+   # Create .env based on .env.example
+   npm run dev
+   ```
+
+3. **Setup Frontend**
+   ```bash
+   cd apps/dev-frontend-ui
+   npm install
+   npm run dev
+   ```
+
+4. **Setup OS Automation**
+   ```bash
+   cd apps/dev-os-automation
+   pip install -r requirements.txt
+   python main.py
+   ```
 
 ---
 
-> *"Just a rather very intelligent system."*
+## 🛡️ Key Features
+- **Intelligent Command Processing**: Natural interaction using LLMs.
+- **Dynamic GitHub Sync**: Automatically push generated code to your repositories.
+- **System Control**: Direct control over volume, brightness, power states, and application launching.
+- **OAuth Integration**: Securely link Google and GitHub accounts.
+- **Real-time Activity Feed**: Live updates of system actions via Socket.io.
+
+---
+
+## 📄 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+Developed with ❤️ by the **DEV.OS Team**.

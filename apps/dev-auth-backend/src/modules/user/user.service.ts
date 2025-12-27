@@ -17,6 +17,20 @@ export class UserService {
   }
 
   /**
+   * Alias for findById (Used in main.ts)
+   */
+  async getUserById(userId: string): Promise<IUser | null> {
+    return this.findById(userId);
+  }
+
+  /**
+   * Update User
+   */
+  async updateUser(userId: string, data: Partial<IUser>): Promise<IUser | null> {
+    return await UserMongoose.findByIdAndUpdate(userId, data, { new: true });
+  }
+
+  /**
    * Find user by email
    */
   async findByEmail(email: string): Promise<IUser | null> {

@@ -113,13 +113,57 @@ export class OAuthHandler {
       throw new Error('Invalid authorization code');
     }
 
-    // Simulated token exchange and profile fetch
-    return {
-      id: `github_${Math.random().toString(36).substr(2, 9)}`,
-      email: 'user@github.com',
-      name: 'GitHub User',
-      provider: 'github'
-    };
+    try {
+      const axios = require('axios');
+
+      // 1. Exchange code for access token
+      const tokenResponse = await axios.post('https://github.com/login/oauth/access_token', {
+        client_id: this.githubClientId,
+        client_secret: this.githubClientSecret,
+        code: code,
+        redirect_uri: this.githubRedirectUri
+      }, {
+        headers: { Accept: 'application/json' }
+      });
+
+      const { access_token } = tokenResponse.data;
+      if (!access_token) throw new Error('Failed to get GitHub access token');
+
+      // 2. Fetch User Profile
+      const profileResponse = await axios.get('https://api.github.com/user', {
+        headers: { Authorization: `Bearer ${access_token}` }
+      });
+
+      const profile = profileResponse.data;
+      let email = profile.email;
+
+      // 3. Fallback: Fetch emails if primary email is null/private
+      if (!email) {
+        try {
+          const emailsResponse = await axios.get('https://api.github.com/user/emails', {
+            headers: { Authorization: `Bearer ${access_token}` }
+          });
+          const emails = emailsResponse.data;
+          const primaryEmail = emails.find((e: any) => e.primary && e.verified) || emails[0];
+          email = primaryEmail?.email;
+        } catch (emailError) {
+          console.error('Failed to fetch GitHub emails:', emailError);
+        }
+      }
+
+      return {
+        id: profile.id.toString(),
+        email: email || `${profile.login}@github.com`, // Absolute fallback
+        name: profile.name || profile.login,
+        provider: 'github',
+        avatar: profile.avatar_url,
+        accessToken: access_token,
+        username: profile.login
+      } as any;
+    } catch (error: any) {
+      console.error('GitHub OAuth Error:', error.response?.data || error.message);
+      throw new Error('Failed to authenticate with GitHub');
+    }
   }
 
   /**
