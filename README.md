@@ -101,7 +101,43 @@ graph TD
 
 ---
 
-## 📄 License
+## �️ Images & Badges
+Below are **three** image options you can add to the README depending on what you want to showcase: quick status badges, static screenshots, or an animated demo GIF. Replace the placeholder paths/URLs with your real images or hosted links.
+
+### Option A — Badges (Quick status)
+Use shields.io style badges that reflect build, license, stars, or other metadata:
+
+```markdown
+[![Build Status](https://img.shields.io/github/actions/workflow/status/Suvam-paul145/Dev-AI-OS-assistant/ci.yml?branch=main)](https://github.com/Suvam-paul145/Dev-AI-OS-assistant/actions)
+[![License](https://img.shields.io/github/license/Suvam-paul145/Dev-AI-OS-assistant.svg)](LICENSE)
+[![Stars](https://img.shields.io/github/stars/Suvam-paul145/Dev-AI-OS-assistant?style=social)](https://github.com/Suvam-paul145/Dev-AI-OS-assistant/stargazers)
+```
+
+### Option B — Screenshots (Project visuals)
+Add screenshots stored in the repo (recommended path: `docs/images/`). Example markup to show three side-by-side images:
+
+```markdown
+<p align="center">
+  <img src="docs/images/frontend.png" alt="Frontend UI" width="280" />
+  <img src="docs/images/os_automation.png" alt="OS Automation" width="280" />
+  <img src="docs/images/voice_system.png" alt="Voice System" width="280" />
+</p>
+```
+
+### Option C — Animated Demo (GIF)
+If you have a short demo, add an animated GIF (recommended: <5s, keep file size small):
+
+```markdown
+![Live demo](docs/demo/dev-os-demo.gif)
+```
+
+> Tips:
+> - Create folders `docs/images/` and `docs/demo/` and commit the actual image/GIF files, or replace the `src` with hosted URLs (raw GitHub or external CDN).
+> - Recommended screenshot resolution: 1280×720 (scale in markdown with `width`), GIF duration <5s and under ~5–10 MB for nicer GitHub rendering.
+
+---
+
+## �📄 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
