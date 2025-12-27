@@ -117,9 +117,9 @@ const CodeBuddy = ({ onCommandExecuted }: CodeBuddyProps) => {
             <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent group-hover:via-cyan-400 transition-all duration-500" />
             <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent opacity-50 group-hover:opacity-100 transition-opacity" />
 
-            <div className="relative bg-slate-900/40 rounded-xl p-6 flex flex-col items-center text-center h-full border border-white/5">
+            <div className="relative bg-slate-900/40 rounded-xl p-6 flex flex-col h-full border border-white/5 overflow-hidden">
                 {/* Status Indicators */}
-                <div className="w-full flex justify-between items-start mb-4">
+                <div className="w-full flex justify-between items-start mb-4 shrink-0">
                     <div className="flex gap-2">
                         <div className="px-2 py-1 rounded bg-blue-500/20 border border-blue-500/30 text-[10px] text-blue-300 flex items-center gap-1">
                             <Globe className="w-3 h-3" /> Online
@@ -134,7 +134,7 @@ const CodeBuddy = ({ onCommandExecuted }: CodeBuddyProps) => {
                 </div>
 
                 {/* Avatar */}
-                <div className="relative mb-6">
+                <div className="relative mb-6 shrink-0 flex flex-col items-center">
                     <div className={`absolute inset-0 bg-blue-500 blur-[40px] opacity-20 ${isLoading ? 'animate-pulse' : ''}`} />
                     <div className="w-32 h-32 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-blue-500/30 flex items-center justify-center relative z-10 shadow-neon-blue animate-float">
                         <div className="text-4xl">🤖</div>
@@ -153,21 +153,24 @@ const CodeBuddy = ({ onCommandExecuted }: CodeBuddyProps) => {
                                 console.error("Failed to sync mic status:", e);
                             }
                         }}
-                        className="px-3 py-1 bg-black/60 rounded-full border border-blue-500/50 text-xs font-bold text-blue-400 shadow-neon-blue z-20 backdrop-blur-md hover:bg-blue-600/20 active:scale-95 transition-all cursor-pointer"
+                        className="px-3 py-1 -mt-4 bg-black/60 rounded-full border border-blue-500/50 text-xs font-bold text-blue-400 shadow-neon-blue z-20 backdrop-blur-md hover:bg-blue-600/20 active:scale-95 transition-all cursor-pointer"
                     >
                         DEV
                     </button>
+                    <h2 className="text-lg font-medium text-white mt-4">
+                        Hello {userName}
+                    </h2>
                 </div>
 
-                {/* Interaction Area */}
-                <div className="w-full mt-auto">
-                    <h2 className="text-lg font-medium text-white mb-2">
-                        Hello {userName}, how can I assist?
-                    </h2>
-                    <p className="text-slate-400 text-sm mb-6 min-h-[2.5rem] line-clamp-2">
-                        {isLoading ? "Processing your request..." : lastResponse}
-                    </p>
+                {/* Scrollable Message Area */}
+                <div className="flex-1 min-h-0 overflow-y-auto mb-4 pr-2 scrollbar-thin scrollbar-thumb-blue-500/20 scrollbar-track-transparent">
+                    <div className="text-slate-400 text-sm whitespace-pre-wrap">
+                        {isLoading ? "Processing..." : lastResponse}
+                    </div>
+                </div>
 
+                {/* Fixed Interaction Area */}
+                <div className="w-full shrink-0 pt-4 border-t border-white/5">
                     <div className="relative group/input">
                         <div className="absolute inset-0 bg-blue-500/20 blur-md rounded-xl opacity-0 group-hover/input:opacity-100 transition-opacity" />
                         <div className="relative flex items-center gap-2 bg-slate-800/50 border border-white/10 rounded-xl p-1 pr-2 backdrop-blur-sm focus-within:border-blue-500/50 focus-within:bg-slate-800/80 transition-all">

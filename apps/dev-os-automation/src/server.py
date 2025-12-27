@@ -22,6 +22,9 @@ try:
     from comtypes import CLSCTX_ALL
     from ctypes import cast, POINTER
     import screen_brightness_control as sbc
+    import subprocess
+    import string
+    import math
 except ImportError:
     print("⚠️  Warning: System control libraries not found. Some features will be mocked.")
 
@@ -142,7 +145,7 @@ def get_command_history():
         return {"commands": []}
 
 @app.post("/execute", response_model=ExecuteResponse)
-def execute_command(req: ExecuteRequest):
+async def execute_command(req: ExecuteRequest):
     print(f"📥 Received command: {req.action} with params: {req.params}")
     
     try:
@@ -151,7 +154,6 @@ def execute_command(req: ExecuteRequest):
             if not app_name:
                 raise ValueError("app_name is required")
             
-            import string
             app_name = app_name.strip(string.punctuation).strip()
 
             # Security Check
@@ -176,15 +178,14 @@ def execute_command(req: ExecuteRequest):
             
             target = apps_map.get(app_name.lower(), app_name)
             # Use Popen for non-blocking launch
-            import subprocess
             subprocess.Popen(f'start "" "{target}"', shell=True)
             
             # Broadcast activity to WebSocket clients
-            asyncio.create_task(broadcast_activity({
+            await broadcast_activity({
                 "type": "success",
                 "title": "App Launched",
                 "message": f"Successfully launched {target}"
-            }))
+            })
             
             return ExecuteResponse(success=True, message=f"Launched {target}")
 
@@ -218,25 +219,27 @@ def execute_command(req: ExecuteRequest):
         elif req.action == "set_mic_mute":
             mute_status = req.params.get("mute", True)
             try:
-                from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-                from comtypes import CLSCTX_ALL
-                from ctypes import cast, POINTER
-                
                 # Get default capture device (Microphone)
                 enumerator = AudioUtilities.GetDeviceEnumerator()
-                # 1 = eCapture, 1 = eCommunications
-                mic_device = enumerator.GetDefaultAudioEndpoint(1, 1) 
+                # 1 = eCapture
+                # 0 = eConsole (Default Device), 1 = eMultimedia, 2 = eCommunications
+                try:
+                    mic_device = enumerator.GetDefaultAudioEndpoint(1, 0) 
+                except Exception:
+                    # Fallback to Communications device if Console fails
+                    mic_device = enumerator.GetDefaultAudioEndpoint(1, 2)
+
                 interface = mic_device.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
                 volume = cast(interface, POINTER(IAudioEndpointVolume))
                 
                 volume.SetMute(1 if mute_status else 0, None)
                 state = "muted" if mute_status else "unmuted"
                 
-                asyncio.create_task(broadcast_activity({
+                await broadcast_activity({
                     "type": "warning" if mute_status else "success",
                     "title": "Mic Status",
                     "message": f"System microphone {state}"
-                }))
+                })
                 
                 return ExecuteResponse(success=True, message=f"Microphone {state}")
             except Exception as e:
@@ -263,6 +266,42 @@ def execute_command(req: ExecuteRequest):
                 return ExecuteResponse(success=False, message="Shutdown blocked for safety")
             return ExecuteResponse(success=True, message=f"System {mode} initiated")
 
+        elif req.action == "clear_recycle_bin":
+            try:
+                # Use powershell to clear recycle bin - using -Force and ignoring errors
+                subprocess.run(['powershell', '-Command', 'Clear-RecycleBin -Force -Confirm:$false -ErrorAction SilentlyContinue'], check=False)
+                
+                await broadcast_activity({
+                    "type": "success",
+                    "title": "Recycle Bin",
+                    "message": "Successfully emptied the recycle bin"
+                })
+                
+                return ExecuteResponse(success=True, message="Recycle bin cleared")
+            except Exception as e:
+                return ExecuteResponse(success=False, message=f"Failed to clear recycle bin: {e}")
+
+        elif req.action == "calculate":
+            expression = req.params.get("expression")
+            if not expression:
+                raise ValueError("expression is required")
+            
+            try:
+                print(f"🧮 Calculating: {expression}")
+                allowed_names = {k: v for k, v in math.__dict__.items() if not k.startswith("__")}
+                result = eval(expression, {"__builtins__": None}, allowed_names)
+                print(f"✅ Result: {result}")
+                
+                await broadcast_activity({
+                    "type": "success",
+                    "title": "Calculator",
+                    "message": f"{expression} = {result}"
+                })
+                
+                return ExecuteResponse(success=True, message=f"The result is {result}", data={"result": result})
+            except Exception as e:
+                return ExecuteResponse(success=False, message=f"Calculation failed: {e}")
+
         elif req.action == "list_apps":
             result = app_controller.list_running_apps()
             return ExecuteResponse(success=result.success, message=result.message, data=result.output)
@@ -275,18 +314,18 @@ def execute_command(req: ExecuteRequest):
         return ExecuteResponse(success=False, message=str(e))
 
 @app.post("/command")
-def handle_command(req: CommandRequest):
+async def handle_command(req: CommandRequest):
     """Handle voice/text commands"""
     try:
         command = req.command.lower()
         
         # Parse and execute command
         if "open" in command and "chrome" in command:
-            return execute_command(ExecuteRequest(action="open_app", params={"app_name": "chrome"}))
+            return await execute_command(ExecuteRequest(action="open_app", params={"app_name": "chrome"}))
         elif "open" in command and ("code" in command or "vs" in command):
-            return execute_command(ExecuteRequest(action="open_app", params={"app_name": "code"}))
+            return await execute_command(ExecuteRequest(action="open_app", params={"app_name": "code"}))
         elif "list" in command and "apps" in command:
-            return execute_command(ExecuteRequest(action="list_apps"))
+            return await execute_command(ExecuteRequest(action="list_apps"))
         else:
             return ExecuteResponse(success=True, message=f"Command received: {command}")
     

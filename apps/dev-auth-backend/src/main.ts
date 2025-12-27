@@ -147,6 +147,23 @@ const normalizeCommandInput = (cmd: string): { action: string | null, params: an
     };
   }
 
+  if (lower.includes('recycle bin') && (lower.includes('empty') || lower.includes('clear') || lower.includes('delete'))) {
+    return {
+      action: 'clear_recycle_bin',
+      params: {},
+      response: "Emptying the recycle bin as requested."
+    };
+  }
+
+  if (lower.startsWith('calculate ')) {
+    const expr = cmd.substring('calculate '.length).trim();
+    return {
+      action: 'calculate',
+      params: { expression: expr },
+      response: `Calculating ${expr}...`
+    };
+  }
+
   // 4. Simple Keywords
   if (lower === 'stop' || lower === 'wait' || lower === 'halt') {
     return {
@@ -164,10 +181,14 @@ const normalizeCommandInput = (cmd: string): { action: string | null, params: an
 const writeCodeToDesktop = async (language: string, fileName: string, code: string) => {
   try {
     const desktopPath = path.join(os.homedir(), 'Desktop', 'DevAI_Projects');
-    if (!fs.existsSync(desktopPath)) {
-      fs.mkdirSync(desktopPath, { recursive: true });
-    }
     const filePath = path.join(desktopPath, fileName);
+    const dirPath = path.dirname(filePath);
+
+    // Recursively create the full directory path
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+
     fs.writeFileSync(filePath, code);
     return { success: true, path: filePath };
   } catch (error) {
@@ -451,6 +472,8 @@ app.post('/api/command', async (req, res) => {
             - github_push: { "action": "github_push", "params": { "repo": string, "file_path": string, "commit_message": string, "content": string } }
             - github_create_repo: { "action": "github_create_repo", "params": { "name": string, "description": string } }
             - set_mic_mute: { "action": "set_mic_mute", "params": { "mute": boolean } }
+            - clear_recycle_bin: { "action": "clear_recycle_bin", "params": {} }
+            - calculate: { "action": "calculate", "params": { "expression": string } }
 
             GitHub Logic:
             1. If pushing, 'repo' should be the name (e.g., "my-repo"). The owner is resolved automatically.
@@ -479,6 +502,10 @@ app.post('/api/command', async (req, res) => {
         if (aiAction && aiAction.action) {
           console.log(`🤖 AI triggered recursive action: ${aiAction.action}`);
 
+          // Strip JSON from the text response shown to user
+          const textForUser = responseText.replace(/```json[\s\S]*?```/g, '').replace(/```[\s\S]*?```/g, '').trim();
+          const finalUserMessage = textForUser || "Processing your request...";
+
           if (aiAction.action === 'write_code') {
             const result = await writeCodeToDesktop(aiAction.params.language, aiAction.params.file_name, aiAction.params.code);
             io.emit('activity', {
@@ -487,7 +514,7 @@ app.post('/api/command', async (req, res) => {
               title: 'Code Created',
               message: `Project saved to Desktop: ${aiAction.params.file_name}`
             });
-            return res.json({ response: { text: `Done. I've created the ${aiAction.params.language} file on your desktop in 'DevAI_Projects'.`, type: 'text' }, execution: result });
+            return res.json({ response: { text: finalUserMessage + `\n\nI've created the ${aiAction.params.language} file on your desktop in 'DevAI_Projects'.`, type: 'text' }, execution: result });
           }
 
           if (aiAction.action === 'github_push') {
@@ -509,7 +536,7 @@ app.post('/api/command', async (req, res) => {
               title: 'GitHub Sync',
               message: result.success ? `Pushed to ${aiAction.params.repo}` : `Push failed: ${result.error || 'Unknown error'}`
             });
-            return res.json({ response: { text: result.success ? `I've pushed the updates to ${aiAction.params.repo}.` : `I tried to push to GitHub but failed: ${result.error || 'Unknown error'}`, type: result.success ? 'text' : 'error' }, execution: result });
+            return res.json({ response: { text: result.success ? finalUserMessage + `\n\nI've pushed the updates to ${aiAction.params.repo}.` : `I tried to push to GitHub but failed: ${result.error || 'Unknown error'}`, type: result.success ? 'text' : 'error' }, execution: result });
           }
 
           if (aiAction.action === 'github_create_repo') {
@@ -544,7 +571,7 @@ app.post('/api/command', async (req, res) => {
 
             return res.json({
               command: { original: command },
-              response: { text: responseText, type: 'text' },
+              response: { text: finalUserMessage, type: 'text' },
               execution: { success: true, mode: 'ai-recursive', details: osData }
             });
           } catch (osErr) {

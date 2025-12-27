@@ -55,7 +55,7 @@ export class OAuthHandler {
     const params = new URLSearchParams({
       client_id: this.githubClientId,
       redirect_uri: this.githubRedirectUri,
-      scope: 'read:user user:email',
+      scope: 'read:user user:email repo',
       state
     });
     return `${GITHUB_AUTH_URL}?${params.toString()}`;

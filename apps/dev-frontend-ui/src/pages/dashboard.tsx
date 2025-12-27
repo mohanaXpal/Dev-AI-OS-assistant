@@ -8,12 +8,13 @@ import TasksControls from '@/components/TasksControls';
 import ActivityLog from '@/components/ActivityLog';
 import Permissions from '@/components/Permissions';
 import PermissionModal from '@/components/PermissionModal';
-import { motion } from 'framer-motion';
+import { motion, Reorder } from 'framer-motion';
 
 export default function Dashboard() {
     const [showPermissions, setShowPermissions] = useState(false);
     const [isHydrated, setIsHydrated] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [items, setItems] = useState(['controls', 'activity', 'buddy']);
 
     const handleRefresh = () => setRefreshTrigger(prev => prev + 1);
 
@@ -44,36 +45,50 @@ export default function Dashboard() {
         <Layout>
             <PermissionModal isOpen={showPermissions} onComplete={() => setShowPermissions(false)} />
             {isHydrated && (
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.8, ease: "circOut" }}
+                <Reorder.Group
+                    axis="x"
+                    values={items}
+                    onReorder={setItems}
                     className="grid grid-cols-12 gap-8 pb-10 min-h-full"
+                    as="div"
                 >
+                    {items.map((item) => (
+                        <Reorder.Item
+                            key={item}
+                            value={item}
+                            className={`col-span-12 ${item === 'activity' ? 'lg:col-span-6' : 'lg:col-span-3'
+                                } reveal`}
+                            as="div"
+                            dragListener={true}
+                        >
+                            {/* Drag Handle Overlay (Visible on Hover) */}
+                            <div className="absolute top-2 right-2 z-50 opacity-0 hover:opacity-100 cursor-grab active:cursor-grabbing p-1 bg-white/10 rounded backdrop-blur">
+                                <span className="text-xs text-white/50">drag</span>
+                            </div>
 
-                    {/* Column 1 (Left): Quick Actions & System Controls */}
-                    <div className="col-span-12 lg:col-span-3 reveal">
-                        <TasksControls onCommandExecuted={handleRefresh} />
-                    </div>
-
-                    {/* Column 2 (Center): Activity Log & Command History */}
-                    <div className="col-span-12 lg:col-span-6 flex flex-col gap-8 reveal">
-                        <div className="flex-1">
-                            <ActivityLog />
-                        </div>
-                        <div className="flex-1">
-                            <CommandHistory refreshTrigger={refreshTrigger} />
-                        </div>
-                    </div>
-
-                    {/* Column 3 (Right): Code Buddy (AI Sidebar) */}
-                    <div className="col-span-12 lg:col-span-3 reveal h-full">
-                        <div className="sticky top-6 h-[calc(100vh-120px)]">
-                            <CodeBuddy onCommandExecuted={handleRefresh} />
-                        </div>
-                    </div>
-
-                </motion.div>
+                            {item === 'controls' && (
+                                <TasksControls onCommandExecuted={handleRefresh} />
+                            )}
+                            {item === 'activity' && (
+                                <div className="flex flex-col gap-8 h-full">
+                                    <div className="flex-1">
+                                        <ActivityLog />
+                                    </div>
+                                    <div className="flex-1">
+                                        <CommandHistory refreshTrigger={refreshTrigger} />
+                                    </div>
+                                </div>
+                            )}
+                            {item === 'buddy' && (
+                                <div className="h-full">
+                                    <div className="sticky top-6 h-[calc(100vh-120px)]">
+                                        <CodeBuddy onCommandExecuted={handleRefresh} />
+                                    </div>
+                                </div>
+                            )}
+                        </Reorder.Item>
+                    ))}
+                </Reorder.Group>
             )}
         </Layout>
     );
